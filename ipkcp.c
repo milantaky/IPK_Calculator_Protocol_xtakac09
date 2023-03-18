@@ -139,8 +139,8 @@ UDP
 
         int inputLength = (int) strlen(input) - 1;                           // - 1, because '\0' is not considered as part of the payload length
         buffer[0] = '\0';                                                    // Opcode
-        //buffer[1] = inputLength + '0';                                       // Payload Length
-        buffer[1] = '\7';
+        buffer[1] = inputLength;                                     // Payload Length
+        //buffer[1] = '\7';
 
         for(int i  = 0; i < inputLength; i++){                               // Fills the payload data area with user input
             buffer[i + 2] = input[i];                                      
