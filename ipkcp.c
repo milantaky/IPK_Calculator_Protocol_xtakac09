@@ -78,7 +78,7 @@ UDP
     
     // Getting the message to send, getting server info ---------------------------------
         struct hostent *server = gethostbyname(host_address);                       // Gets info about server. Parameter takes either address or name
-        if(server == NULL){
+        if(server == NULL){                                                         // Invalid server name
             fprintf(stderr, "ERROR: no such host %s.\n", host_address);
             return 1;
         }
@@ -88,7 +88,7 @@ UDP
 
         server_address.sin_family = AF_INET;
         server_address.sin_port = htons(port_number);                               // sets port that the socket will use. htonl() translates an unsigned long integer into network byte order
-        memcpy(&server_address.sin_addr.s_addr, server->h_name, server->h_length); 
+        memcpy(&server_address.sin_addr.s_addr, server->h_name, server->h_length);  
 
         printf("INFO: Server socket: %s : %d \n", 
                inet_ntoa(server_address.sin_addr),                                  // server's in address
@@ -134,7 +134,7 @@ UDP
             buffer[i + 2] = input[i];                                      
         }
         //close(client_socket);
-        int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, address, address_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
+        int bytes_tx = sendto(client_socket, buffer, (inputLength + 3), 0, address, address_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
         if(bytes_tx < 0){
             fprintf(stderr, "ERROR: sendto.\n");
         }
