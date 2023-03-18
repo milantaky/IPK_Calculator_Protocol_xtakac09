@@ -78,7 +78,7 @@ UDP
     // Getting the message to send, getting server info ---------------------------------
         struct hostent *server = gethostbyname(host_address);                       // Gets info about server. Parameter takes either address or name
         if(server == NULL){
-            fprintf(stderr, "ERROR: no such host %s\n", host_address);
+            fprintf(stderr, "ERROR: no such host %s.\n", host_address);
             return 1;
         }
 
@@ -95,16 +95,14 @@ UDP
                inet_ntoa(server_address.sin_addr),                                  // server's in address
                ntohs(server_address.sin_port));                                     // server's in port
 
-    // SENDTO() - sending message to server
-
-        // REQUEST  
+    // SENDTO() - sending message to server 
+        // OPCODE: 0 = request
+        //         1 = response
 
         // operator = "+" / "-" / "*" / "/"                 
         // expr = "(" operator 2*(SP expr) ")" / 1*DIGIT        --->  this means,  that it is possible to send (+ 1 2), or (+ (- 2 4) 4), or (+ (+ 1 2) (+ 1 2))
-        //                                                            or that an expression can be 8 or (+ 3 3)
         // query = "(" operator 2*(SP expr) ")"
 
-        // OPCODE: 0 = request, 1 = response
 
         //         0               1              2               3
         // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -118,8 +116,7 @@ UDP
         // +---------------------------------------------------------------+
 
         struct sockaddr *address = (struct sockaddr *) &server_address;
-        int address_size = sizeof(server_address);                         
-
+        socklen_t address_size = sizeof(server_address);                         
 
         // Fill the buffer -> scan from input, prepare for request
         memset(buffer, 0, sizeof(buffer));                                  // Fills buffer with 0
@@ -144,17 +141,17 @@ UDP
             buffer[i + 2] = input[i];                                      
         }
 
-        // printf("Obsah bufferu - opcode: %c\n", buffer[0]);
-        // printf("Obsah bufferu - payload length: %c\n", buffer[1]);
         printf("Obsah bufferu se zpravou: %s\n", buffer);
 
-        int bytes_tx = sendto(client_socket, buffer, strlen(buffer) + 1, 0, address, address_size);    // strlen() + 1, because here we want the '\0' to be counted as well
+        int bytes_tx = sendto(client_socket, buffer, strlen(buffer), 0, address, address_size);    // strlen() + 1, because here we want the '\0' to be counted as well
         if(bytes_tx < 0){
             fprintf(stderr, "ERROR: sendto.\n");
         }
+        printf("sent\n");
         
     // RECVFROM() - waiting for response
-        // Status code: 0 = OK, 1 = ERROR
+        // STATUS CODE: 0 = OK
+        //              1 = ERROR
 
         // 0                   1                   2                   3
         // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -166,7 +163,6 @@ UDP
         // + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
         // |                     Payload Data continued ...                |
         // +---------------------------------------------------------------+
-
 
         memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
 
