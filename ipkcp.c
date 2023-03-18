@@ -6,7 +6,7 @@
 #include <arpa/inet.h>      // htons
 #include <unistd.h>         // close
 
-#define BUFFER_SIZE 258     // maximum length of payload - 256B + 2B (opcode, payload length)
+#define BUFFER_SIZE 512     // maximum length of payload - 256B + 2B (opcode, payload length)
 
 // TODO
 //  - check adresy v argumentu
@@ -60,7 +60,7 @@ UDP
     char host_address[16];               
     strcpy(host_address, argv[2]);
 
-    uint16_t port_number = atoi(argv[4]);
+    int port_number = atoi(argv[4]);
     char buffer[BUFFER_SIZE];
     char input[BUFFER_SIZE];
 
