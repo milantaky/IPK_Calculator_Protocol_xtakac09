@@ -6,7 +6,7 @@
 #include <arpa/inet.h>      // htons
 #include <unistd.h>         // close
 
-#define BUFFER_SIZE 500     //zmenit
+#define BUFFER_SIZE 258     // maximum length of payload - 256B + 2B (opcode, payload length)
 
 // TODO
 //  - check adresy v argumentu
@@ -60,7 +60,8 @@ UDP
     strcpy(host_address, argv[2]);
 
     uint16_t port_number = atoi(argv[4]);
-    char buffer[500];
+    char buffer[BUFFER_SIZE];
+    char input[BUFFER_SIZE];
 
 // UDP - no need to disconnect if an error occurs
     if(strcmp(conType, "udp") == 0){        
@@ -100,8 +101,10 @@ UDP
 
         // operator = "+" / "-" / "*" / "/"                 
         // expr = "(" operator 2*(SP expr) ")" / 1*DIGIT        --->  this means,  that it is possible to send (+ 1 2), or (+ (- 2 4) 4), or (+ (+ 1 2) (+ 1 2))
-        //                                                            or that an expression can be 8 or (+ 3 2)
+        //                                                            or that an expression can be 8 or (+ 3 3)
         // query = "(" operator 2*(SP expr) ")"
+
+        // OPCODE: 0 = request, 1 = response
 
         //         0               1              2               3
         // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -114,33 +117,72 @@ UDP
         // |                     Payload Data continued ...                |
         // +---------------------------------------------------------------+
 
-        // IMO there is no need to fill buffer with 0 because of the payload lenght
-
-
-
-
-
-
-
-        // naplnit buffer - nacte se ze vstupu dotaz, a zpracuje 
-
         struct sockaddr *address = (struct sockaddr *) &server_address;
         int address_size = sizeof(server_address);
 
 
-        int bytes_tx = sendto(client_socket, buffer, strlen(buffer), 0, address, address_size);
-        
+        // Fill the buffer -> scan from input, prepare for request
+        memset(buffer, 0, sizeof(buffer));      //fills buffer with 0
+
+        if(fgets(input, BUFFER_SIZE, stdin) == NULL){                       // Reads from input 
+            fprintf(stderr, "ERROR occured while reading input.\n");
+            return 1;
+        }
+
+        // I expect that the input is well-formatted -> if not, the server will reply with an error response
+            // EXAMPLE:
+            // input: (+ 1 2)
+            // opcode = 0           (request)
+            // payload length = 7    
+            // payload data = "(+ 1 2)"
+
+        buffer[0] = 0;                                                      // Opcode
+        buffer[1] = strlen(input);                                          // Payload length - hopefully converts to char 
+        int inputLength = strlen(input);
+        for(int i  = 0; i < inputLength; i++){                            // Fills the payload data area with user input
+            buffer[i + 2] = input[i];                                      
+        }
+
+        int bytes_tx = sendto(client_socket, buffer, strlen(buffer), 0, address, address_size);        
         if(bytes_tx < 0){
             fprintf(stderr, "ERROR: sendto\n");
         }
         
-    // RECVFROM() - waiting for response
-        // tady bude nejakej loop, kde se bude cekat na odpoved, ta se zpracuje a vypise
+        // RECVFROM() - waiting for response
 
+        // 0                   1                   2                   3
+        // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+        // +---------------+---------------+---------------+---------------+
+        // |     Opcode    |  Status Code  |Payload Length | Payload Data  |
+        // |      (8)      |      (8)      |      (8)      |               |
+        // +---------------+---------------+---------------+ - - - - - - - +
+        // :                     Payload Data continued ...                :
+        // + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+        // |                     Payload Data continued ...                |
+        // +---------------------------------------------------------------+
 
+        // Status code: 0 = OK, 1 = ERROR
 
+        int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, address, (socklen_t *) &address_size);
+        if(bytes_rx < 0){
+            fprintf(stderr, "ERROR: recvfrom.\n");
+            return 1;
+        }
 
+        if(buffer[0] == '1'){
+            printf("responded\n");
+        }
 
+        if(buffer[1] == '1'){
+            fprintf(stderr, "ERROR: Invalid expression.\n");
+        }
+
+        int responseLength = buffer[3];
+        printf("OK:");
+        for(int i = 3; i < responseLength + 3; i++){
+            printf("%c", buffer[i]);
+        }
+        printf("\n");
 
         close(client_socket);
     }
