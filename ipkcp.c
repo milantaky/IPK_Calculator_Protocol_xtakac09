@@ -60,7 +60,7 @@ UDP
     strcpy(host_address, argv[2]);
 
     uint16_t port_number = atoi(argv[4]);
-    char buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE] = "soclkscslk";
     char input[BUFFER_SIZE];
 
 // UDP - no need to disconnect if an error occurs
@@ -118,11 +118,11 @@ UDP
         // +---------------------------------------------------------------+
 
         struct sockaddr *address = (struct sockaddr *) &server_address;
-        int address_size = sizeof(server_address);
+        int address_size = sizeof(server_address);                         
 
 
         // Fill the buffer -> scan from input, prepare for request
-        memset(buffer, 0, sizeof(buffer));      //fills buffer with 0
+        memset(buffer, 0, sizeof(buffer));                                  // Fills buffer with 0
 
         if(fgets(input, BUFFER_SIZE, stdin) == NULL){                       // Reads from input 
             fprintf(stderr, "ERROR occured while reading input.\n");
@@ -136,19 +136,25 @@ UDP
             // payload length = 7    
             // payload data = "(+ 1 2)"
 
-        buffer[0] = 0;                                                      // Opcode
-        buffer[1] = strlen(input);                                          // Payload length - hopefully converts to char 
-        int inputLength = strlen(input);
-        for(int i  = 0; i < inputLength; i++){                            // Fills the payload data area with user input
+        int inputLength = (int) strlen(input) - 1;                           // - 1, because '\0' is not considered as part of the payload length
+        buffer[0] = '0';                                                     // Opcode
+        buffer[1] = inputLength + '0';                                       // Payload Length
+
+        for(int i  = 0; i < inputLength; i++){                               // Fills the payload data area with user input
             buffer[i + 2] = input[i];                                      
         }
 
-        int bytes_tx = sendto(client_socket, buffer, strlen(buffer), 0, address, address_size);        
+        // printf("Obsah bufferu - opcode: %c\n", buffer[0]);
+        // printf("Obsah bufferu - payload length: %c\n", buffer[1]);
+        printf("Obsah bufferu se zpravou: %s\n", buffer);
+
+        int bytes_tx = sendto(client_socket, buffer, strlen(buffer) + 1, 0, address, address_size);    // strlen() + 1, because here we want the '\0' to be counted as well
         if(bytes_tx < 0){
-            fprintf(stderr, "ERROR: sendto\n");
+            fprintf(stderr, "ERROR: sendto.\n");
         }
         
-        // RECVFROM() - waiting for response
+    // RECVFROM() - waiting for response
+        // Status code: 0 = OK, 1 = ERROR
 
         // 0                   1                   2                   3
         // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -161,7 +167,8 @@ UDP
         // |                     Payload Data continued ...                |
         // +---------------------------------------------------------------+
 
-        // Status code: 0 = OK, 1 = ERROR
+
+        memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
 
         int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, address, (socklen_t *) &address_size);
         if(bytes_rx < 0){
