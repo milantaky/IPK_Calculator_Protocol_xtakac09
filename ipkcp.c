@@ -116,7 +116,7 @@ UDP
         // +---------------------------------------------------------------+
 
         //struct sockaddr *address = (struct sockaddr *) &server_address;
-        socklen_t address_size = sizeof(server_address);                         
+        int server_size = sizeof(server_address);                         
 
         memset(buffer, 0, BUFFER_SIZE);                                  // Fills buffer with 0
 
@@ -134,8 +134,8 @@ UDP
             buffer[i + 2] = input[i];                                      
         }
         //close(client_socket);
-        //int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, address, address_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
-        int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, (struct sockaddr *) &server_address, sizeof(server_address));    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
+        //int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, address, server_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
+        int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, (struct sockaddr *) &server_address, server_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
         if(bytes_tx < 0){
             fprintf(stderr, "ERROR: sendto.\n");
         }
@@ -158,7 +158,7 @@ UDP
 
         memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
         
-        int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, (struct sockaddr *) &server_address, &address_size);
+        int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, (struct sockaddr *) &server_address, &server_size);
         printf("doslo\n");
         if(bytes_rx < 0){
             fprintf(stderr, "ERROR: recvfrom.\n");
