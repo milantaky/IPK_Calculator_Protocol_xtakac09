@@ -68,9 +68,9 @@ UDP
     if(strcmp(conType, "udp") == 0){        
         int family = AF_INET;                                                       // ipv4
         int type = SOCK_DGRAM;
-        int client_socket = socket(family, type, 0);
 
     // SOCKET() - creating socket
+        int client_socket = socket(family, type, 0);
         if(client_socket <= 0){     
             fprintf(stderr, "ERROR: socket.\n");
             return 1;
@@ -87,24 +87,23 @@ UDP
         memset(&server_address, 0, sizeof(server_address));                         // fills server address with zeros
 
         server_address.sin_family = AF_INET;
-        server_address.sin_port = htons(port_number);                               // sets port that the socket will use. 
-                                                                                    // htonl() translates an unsigned long integer into network byte order
-    // BIND() - binds socket to port
-        if(bind(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) == -1){
-            fprintf(stderr, "ERROR: bind.\n");
-            return 1;
-        }
-
+        server_address.sin_port = htons(port_number);                               // sets port that the socket will use. htonl() translates an unsigned long integer into network byte order
         memcpy(&server_address.sin_addr.s_addr, server->h_name, server->h_length); 
 
         printf("INFO: Server socket: %s : %d \n", 
                inet_ntoa(server_address.sin_addr),                                  // server's in address
                ntohs(server_address.sin_port));                                     // server's in port
 
+    // BIND() - binds socket to port
+        if(bind(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) == -1){
+            fprintf(stderr, "ERROR: bind.\n");
+            return 1;
+        }
+
     // SENDTO() - sending message to server 
         // OPCODE: 0 = request
         //         1 = response
-
+        //
         //         0               1              2               3
         // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
         // +---------------+---------------+-------------------------------+    OPCODE         --->     + - / *
@@ -134,17 +133,17 @@ UDP
         for(int i  = 0; i < inputLength; i++){                              // Fills the payload data area with user input
             buffer[i + 2] = input[i];                                      
         }
-
-        int bytes_tx = sendto(client_socket, buffer, (inputLength + 3), 0, address, address_size);    // inputLength + 3, because opcode + payloadLength + input + '\0'
+        //close(client_socket);
+        int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, address, address_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
         if(bytes_tx < 0){
             fprintf(stderr, "ERROR: sendto.\n");
         }
-        printf("sent\n");
+        printf("Bytes sent %d\n", bytes_tx);
         
     // RECVFROM() - waiting for response
         // STATUS CODE: 0 = OK
         //              1 = ERROR
-
+        //
         // 0                   1                   2                   3
         // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
         // +---------------+---------------+---------------+---------------+
@@ -158,10 +157,12 @@ UDP
 
         memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
 
-        int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, address, (socklen_t *) &address_size);
+        int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, address, &address_size);
         if(bytes_rx < 0){
             fprintf(stderr, "ERROR: recvfrom.\n");
             return 1;
+        } else {
+            printf("GOT A MESSAGE\n");
         }
 
         if(buffer[0] == '1'){
