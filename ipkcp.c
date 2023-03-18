@@ -155,10 +155,10 @@ UDP
         // |                     Payload Data continued ...                |
         // +---------------------------------------------------------------+
 
-        //memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
-        bzero(buffer, BUFFER_SIZE);
-        printf("eskere\n");
-        int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, address, &address_size);
+        memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
+        
+        int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, (struct sockaddr *) &address, &address_size);
+        printf("doslo\n");
         if(bytes_rx < 0){
             fprintf(stderr, "ERROR: recvfrom.\n");
             return 1;
@@ -182,7 +182,7 @@ UDP
         }
         printf("\n");
 
-        //close(client_socket);
+        close(client_socket);
     }
 
     if(strcmp(conType, "tcp") == 0){        // TCP
