@@ -60,7 +60,7 @@ UDP
     strcpy(host_address, argv[2]);
 
     uint16_t port_number = atoi(argv[4]);
-    char buffer[BUFFER_SIZE] = "soclkscslk";
+    char buffer[BUFFER_SIZE];
     char input[BUFFER_SIZE];
 
 // UDP - no need to disconnect if an error occurs
