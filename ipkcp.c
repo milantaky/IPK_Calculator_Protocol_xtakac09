@@ -118,7 +118,7 @@ UDP
         struct sockaddr *address = (struct sockaddr *) &server_address;
         socklen_t address_size = sizeof(server_address);                         
 
-        memset(buffer, 0, sizeof(buffer));                                  // Fills buffer with 0
+        memset(buffer, 0, BUFFER_SIZE);                                  // Fills buffer with 0
 
     // MESSAGE
         if(fgets(input, BUFFER_SIZE, stdin) == NULL){                       // Reads from input 
@@ -134,7 +134,7 @@ UDP
             buffer[i + 2] = input[i];                                      
         }
         //close(client_socket);
-        int bytes_tx = sendto(client_socket, buffer, (inputLength + 3), 0, address, address_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
+        int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, address, address_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
         if(bytes_tx < 0){
             fprintf(stderr, "ERROR: sendto.\n");
         }
@@ -155,8 +155,9 @@ UDP
         // |                     Payload Data continued ...                |
         // +---------------------------------------------------------------+
 
-        memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
-
+        //memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
+        bzero(buffer, BUFFER_SIZE);
+        printf("eskere\n");
         int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, address, &address_size);
         if(bytes_rx < 0){
             fprintf(stderr, "ERROR: recvfrom.\n");
@@ -165,6 +166,7 @@ UDP
             printf("GOT A MESSAGE\n");
         }
 
+        
         if(buffer[0] == '1'){
             printf("responded\n");
         }
@@ -180,7 +182,7 @@ UDP
         }
         printf("\n");
 
-        close(client_socket);
+        //close(client_socket);
     }
 
     if(strcmp(conType, "tcp") == 0){        // TCP
