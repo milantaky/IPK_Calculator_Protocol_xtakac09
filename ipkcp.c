@@ -116,7 +116,7 @@ UDP
         // +---------------------------------------------------------------+
 
         //struct sockaddr *address = (struct sockaddr *) &server_address;
-        int server_size = sizeof(server_address);                         
+        socklen_t server_size = sizeof(server_address);                         
 
         memset(buffer, 0, BUFFER_SIZE);                                  // Fills buffer with 0
 
