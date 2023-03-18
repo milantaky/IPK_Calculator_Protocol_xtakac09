@@ -137,16 +137,13 @@ UDP
             // payload length = 7    
             // payload data = "(+ 1 2)"
 
-        int inputLength = (int) strlen(input) - 1;                           // - 1, because '\0' is not considered as part of the payload length
-        buffer[0] = '\0';                                                    // Opcode
-        buffer[1] = inputLength;                                     // Payload Length
-        //buffer[1] = '\7';
+        int inputLength = (int) strlen(input) - 1;                          // - 1, because '\0' is not considered as part of the payload length
+        buffer[0] = 0;                                                      // Opcode
+        buffer[1] = inputLength;                                            // Payload Length
 
-        for(int i  = 0; i < inputLength; i++){                               // Fills the payload data area with user input
+        for(int i  = 0; i < inputLength; i++){                              // Fills the payload data area with user input
             buffer[i + 2] = input[i];                                      
         }
-
-        printf("Obsah bufferu se zpravou: %s\n", buffer);
 
         int bytes_tx = sendto(client_socket, buffer, strlen(buffer), 0, address, address_size);    // strlen() + 1, because here we want the '\0' to be counted as well
         if(bytes_tx < 0){
