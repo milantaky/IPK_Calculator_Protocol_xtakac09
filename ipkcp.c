@@ -18,10 +18,11 @@ int main(int argc, char** argv){
 /*
 UDP
 - vytvorim socket               DONE
+- bind
 - zjistim info o serveru        DONE
-- ziskam zpravu k poslani
-- upravim do formatu?
-- poslu zpravu
+- ziskam zpravu k poslani       DONE   
+- upravim do formatu?           DONE
+- poslu zpravu                  DONE
 - cekam na odpoved
 - zavru socket                  DONE
 
@@ -88,9 +89,10 @@ UDP
         server_address.sin_family = AF_INET;
         server_address.sin_port = htons(port_number);                               // sets port that the socket will use. 
                                                                                     // htonl() translates an unsigned long integer into network byte order
-        
+    // BIND() - binds socket to port
         if(bind(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) == -1){
             fprintf(stderr, "ERROR: bind.\n");
+            return 1;
         }
 
         memcpy(&server_address.sin_addr.s_addr, server->h_name, server->h_length); 
@@ -102,11 +104,6 @@ UDP
     // SENDTO() - sending message to server 
         // OPCODE: 0 = request
         //         1 = response
-
-        // operator = "+" / "-" / "*" / "/"                 
-        // expr = "(" operator 2*(SP expr) ")" / 1*DIGIT        --->  this means,  that it is possible to send (+ 1 2), or (+ (- 2 4) 4), or (+ (+ 1 2) (+ 1 2))
-        // query = "(" operator 2*(SP expr) ")"
-
 
         //         0               1              2               3
         // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -122,20 +119,13 @@ UDP
         struct sockaddr *address = (struct sockaddr *) &server_address;
         socklen_t address_size = sizeof(server_address);                         
 
-        // Fill the buffer -> scan from input, prepare for request
         memset(buffer, 0, sizeof(buffer));                                  // Fills buffer with 0
 
+    // MESSAGE
         if(fgets(input, BUFFER_SIZE, stdin) == NULL){                       // Reads from input 
             fprintf(stderr, "ERROR occured while reading input.\n");
             return 1;
         }
-
-        // I expect that the input is well-formatted -> if not, the server will reply with an error response
-            // EXAMPLE:
-            // input: (+ 1 2)
-            // opcode = 0           (request)
-            // payload length = 7    
-            // payload data = "(+ 1 2)"
 
         int inputLength = (int) strlen(input) - 1;                          // - 1, because '\0' is not considered as part of the payload length
         buffer[0] = 0;                                                      // Opcode
