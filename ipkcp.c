@@ -89,6 +89,10 @@ UDP
         server_address.sin_port = htons(port_number);                               // sets port that the socket will use. 
                                                                                     // htonl() translates an unsigned long integer into network byte order
         
+        if(bind(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) == -1){
+            fprintf(stderr, "ERROR: bind.\n");
+        }
+
         memcpy(&server_address.sin_addr.s_addr, server->h_name, server->h_length); 
 
         printf("INFO: Server socket: %s : %d \n", 
@@ -134,7 +138,7 @@ UDP
             // payload data = "(+ 1 2)"
 
         int inputLength = (int) strlen(input) - 1;                           // - 1, because '\0' is not considered as part of the payload length
-        buffer[0] = '0';                                                     // Opcode
+        buffer[0] = '\0';                                                    // Opcode
         buffer[1] = inputLength + '0';                                       // Payload Length
 
         for(int i  = 0; i < inputLength; i++){                               // Fills the payload data area with user input
