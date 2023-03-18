@@ -95,10 +95,10 @@ UDP
                ntohs(server_address.sin_port));                                     // server's in port
 
     // BIND() - binds socket to port
-        if(bind(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) == -1){
-            fprintf(stderr, "ERROR: bind.\n");
-            return 1;
-        }
+        // if(bind(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) == -1){
+        //     fprintf(stderr, "ERROR: bind.\n");
+        //     return 1;
+        // }
 
     // SENDTO() - sending message to server 
         // OPCODE: 0 = request
