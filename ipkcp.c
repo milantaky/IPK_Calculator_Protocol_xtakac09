@@ -145,7 +145,7 @@ UDP
             buffer[i + 2] = input[i];                                      
         }
 
-        int bytes_tx = sendto(client_socket, buffer, strlen(buffer), 0, address, address_size);    // strlen() + 1, because here we want the '\0' to be counted as well
+        int bytes_tx = sendto(client_socket, buffer, (inputLength + 3), 0, address, address_size);    // inputLength + 3, because opcode + payloadLength + input + '\0'
         if(bytes_tx < 0){
             fprintf(stderr, "ERROR: sendto.\n");
         }
