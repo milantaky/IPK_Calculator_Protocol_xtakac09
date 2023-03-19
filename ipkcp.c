@@ -131,7 +131,7 @@ int main(int argc, char** argv){
             memset(buffer_udp, 0, BUFFER_SIZE_UDP);                                 // Fills buffer with 0
             
             if(fgets(input, BUFFER_SIZE_UDP, stdin) == NULL){                       // Reads from input 
-                fprintf(stderr, "ERROR occured while reading input.\n");
+                fprintf(stderr, "ERROR occured while reading input2.\n");
                 return 1;
             }
 
@@ -205,7 +205,7 @@ int main(int argc, char** argv){
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP);                                     // Fills buffer with 0
             
             if(fgets(input_tcp, BUFFER_SIZE_TCP, stdin) == NULL){                       // Reads from input 
-                fprintf(stderr, "ERROR occured while reading input.\n");
+                fprintf(stderr, "ERROR occured while reading input1.\n");
                 return 1;
             }
 
