@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>         // atoi
 #include <sys/socket.h>     // socket, sendto
+#include <sys/types.h>
 #include <netdb.h>          // gethostbyname
 #include <arpa/inet.h>      // htons
 #include <unistd.h>         // close
