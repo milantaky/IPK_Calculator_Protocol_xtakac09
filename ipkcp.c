@@ -169,7 +169,6 @@ int main(int argc, char** argv){
         while(keepRunning){
         // MESSAGE
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP);                                     // Fills buffer with 0
-            printf("Napis message:");
             
             if(fgets(input_tcp, BUFFER_SIZE_TCP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input.\n");
@@ -177,14 +176,12 @@ int main(int argc, char** argv){
             }
 
             strcpy(buffer_tcp, input_tcp);                                              // Copies input into buffer
-            //buffer_tcp[strlen(input) + 1] = '\0';                                   // Puts '\0' as last character instead of '\n'
     
      // SEND()
             int bytes_tx = send(client_socket, buffer_tcp, strlen(buffer_tcp), 0);
             if(bytes_tx < 0){
                 fprintf(stderr, "ERROR: send.\n");
             }
-            printf("sent\n");
 
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP);                                     // Fills buffer with 0
 
@@ -212,6 +209,5 @@ int main(int argc, char** argv){
         close(client_socket);
     }
 
-    printf("koncim\n");
     return 0;
 }
