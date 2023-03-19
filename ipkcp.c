@@ -5,6 +5,7 @@
 #include <netdb.h>          // gethostbyname
 #include <arpa/inet.h>      // htons
 #include <unistd.h>         // close
+#include <signal.h>
 
 #define BUFFER_SIZE 512     // maximum length of payload - 256B + 2B (opcode, payload length)
 
@@ -14,27 +15,17 @@
 
 // rozdil mezi win a unix bude mozna v adresach neceho, struktura sockaddr_in nebo tak
 
+static volatile int keepRunning = 1;
+
+void intHandler() {
+    keepRunning = 0;
+}
+
 int main(int argc, char** argv){
-/*
-UDP
-- vytvorim socket               DONE
-- bind
-- zjistim info o serveru        DONE
-- ziskam zpravu k poslani       DONE   
-- upravim do formatu?           DONE
-- poslu zpravu                  DONE
-- cekam na odpoved
-- zavru socket                  DONE
+    signal(SIGINT, intHandler);                                     // For C-c interrupt
 
-
-*/
-
-
-
-
-
-// Parameter check -------------------------------------------------------------------
-    if(argc != 7){                          // Number of args
+// Parameter check 
+    if(argc != 7){                                                  // Number of args
         fprintf(stderr, "ERROR: Wrong number of arguments. %d of 6 needed.\n", argc);
         return 1;
     }
@@ -49,12 +40,12 @@ UDP
         return 1;
     }
 
-    if(atoi(argv[4]) < 0){                  // checks if port number isn't negative
+    if(atoi(argv[4]) < 0){                                          // Checks if port number isn't negative
         fprintf(stderr, "ERROR: Wrong port parameter: %s.\n", argv[4]);
         return 1;
     }
 
-    char conType[4];                                                                //connection type (UDP/TCP)
+    char conType[4];                                                // Connection type (UDP/TCP)
     strcpy(conType, argv[6]);
 
     char host_address[16];               
@@ -84,7 +75,7 @@ UDP
             inet_ntoa(server_address.sin_addr),                                  // server's in address
             ntohs(server_address.sin_port));                                     // server's in port
 
-//------------------------------------------------------------------------------------------
+// UDP ------------------------------------------------------------------------------------------
     if(strcmp(conType, "udp") == 0){        // UDP - no need to disconnect if an error occurs
         int type = SOCK_DGRAM;
 
@@ -105,12 +96,17 @@ UDP
         socklen_t server_size = sizeof(server_address);                         
 
     // MESSAGE
-        while(1){
+        while(keepRunning){
             memset(buffer, 0, BUFFER_SIZE);                                     // Fills buffer with 0
             printf("Napis message:");
             if(fgets(input, BUFFER_SIZE, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input.\n");
                 return 1;
+            }
+
+            if(strcmp(input, "exit\n") == 0){
+                printf("Exiting...\n");
+                return 0;
             }
 
             int inputLength = (int) strlen(input) - 1;                          // - 1, because '\n' is not considered as part of the payload length
@@ -154,7 +150,13 @@ UDP
 
     }
 
+// TCP ------------------------------------------------------------------------------------------
     if(strcmp(conType, "tcp") == 0){        // TCP
+        while(keepRunning){
+        
+        }
+        printf("zmacklo se C-c\n");
+        // tady doplnit kod pro interrupt aby se to odpojilo, a asi i normalne
     }
 
     printf("koncim\n");
