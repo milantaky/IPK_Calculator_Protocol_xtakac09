@@ -210,10 +210,11 @@ int main(int argc, char** argv){
             
             if(fgets(input_tcp, BUFFER_SIZE_TCP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input1.\n");
-                if(!keepRunning){
-                    break;
-                } else {
+                if(keepRunning){                                                       // Because of interrupt signal, if it was pressed, it goes here
                     return 1;
+                } else {
+                    strcpy(input_tcp, "BYE");
+                    break;
                 }
             }
 
@@ -241,8 +242,6 @@ int main(int argc, char** argv){
     // CLOSE()
         if(!keepRunning){ 
             printf("zmacklo se C-c, ukoncuju.\n");
-
-
         } else {
             printf("ukoncuju\n");
         }
