@@ -229,7 +229,7 @@ int main(int argc, char** argv){
             }
 
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP);                                     // Fills buffer with 0
-            printf("jeste su tu2 za sendem\n");
+
     // RECV()
             int bytes_rx = recv(client_socket, buffer_tcp, BUFFER_SIZE_TCP, 0);
             if(bytes_rx < 0){
@@ -244,6 +244,20 @@ int main(int argc, char** argv){
     // CLOSE()
         if(!keepRunning){ 
             printf("zmacklo se C-c, ukoncuju.\n");
+            strcpy(buffer_tcp, input_tcp);
+
+            if(send(client_socket, buffer_tcp, strlen(buffer_tcp), 0) < 0){
+                fprintf(stderr, "ERROR: send.\n");
+            }
+
+            memset(buffer_tcp, 0, BUFFER_SIZE_TCP); 
+
+            if(recv(client_socket, buffer_tcp, BUFFER_SIZE_TCP, 0) < 0){
+                fprintf(stderr, "ERROR: recv.\n");
+            }
+
+            printf("%s", buffer_tcp);
+
         } else {
             printf("ukoncuju\n");
         }
