@@ -187,9 +187,7 @@ int main(int argc, char** argv){
             
             if(fgets(input_tcp, BUFFER_SIZE_TCP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input.\n");
-                if(keepRunning){                                                       // Because of interrupt signal, if it was pressed, it goes here
-                    return 1;
-                } else {
+                if(!keepRunning){
                     strcpy(input_tcp, "BYE");
                     break;
                 }
@@ -233,8 +231,8 @@ int main(int argc, char** argv){
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP); 
 
             
-           int bytes_rx = recv(client_socket, buffer_tcp, BUFFER_SIZE_TCP, 0);
-            if(bytes_rx < 0){
+            int bytes_sx = recv(client_socket, buffer_tcp, BUFFER_SIZE_TCP, 0);
+            if(bytes_sx < 0){
                 fprintf(stderr, "ERROR: recv.\n");
             }
 
