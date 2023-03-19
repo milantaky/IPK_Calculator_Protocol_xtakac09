@@ -63,10 +63,28 @@ UDP
     int port_number = atoi(argv[4]);
     char buffer[BUFFER_SIZE];
     char input[BUFFER_SIZE];
+    int family = AF_INET;                                                       // ipv4
 
-// UDP - no need to disconnect if an error occurs
-    if(strcmp(conType, "udp") == 0){        
-        int family = AF_INET;                                                       // ipv4
+    // Getting the message to send, getting server info 
+    struct hostent *server = gethostbyname(host_address);                       // Gets info about server. Parameter takes either address or name
+    if(server == NULL){                                                         // Invalid server name
+        fprintf(stderr, "ERROR: no such host %s.\n", host_address);
+        return 1;
+    }
+
+    struct sockaddr_in server_address;
+    memset(&server_address, 0, sizeof(server_address));                         // fills server address with zeros
+
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(port_number);                               // sets port that the socket will use. htonl() translates an unsigned long integer into network byte order
+    memcpy(&server_address.sin_addr.s_addr, server->h_name, server->h_length);  
+
+    printf("INFO: Server socket: %s : %d \n", 
+            inet_ntoa(server_address.sin_addr),                                  // server's in address
+            ntohs(server_address.sin_port));                                     // server's in port
+
+//------------------------------------------------------------------------------------------
+    if(strcmp(conType, "udp") == 0){        // UDP - no need to disconnect if an error occurs
         int type = SOCK_DGRAM;
 
     // SOCKET() - creating socket
@@ -75,24 +93,6 @@ UDP
             fprintf(stderr, "ERROR: socket.\n");
             return 1;
         }
-    
-    // Getting the message to send, getting server info ---------------------------------
-        struct hostent *server = gethostbyname(host_address);                       // Gets info about server. Parameter takes either address or name
-        if(server == NULL){                                                         // Invalid server name
-            fprintf(stderr, "ERROR: no such host %s.\n", host_address);
-            return 1;
-        }
-
-        struct sockaddr_in server_address;
-        memset(&server_address, 0, sizeof(server_address));                         // fills server address with zeros
-
-        server_address.sin_family = AF_INET;
-        server_address.sin_port = htons(port_number);                               // sets port that the socket will use. htonl() translates an unsigned long integer into network byte order
-        memcpy(&server_address.sin_addr.s_addr, server->h_name, server->h_length);  
-
-        printf("INFO: Server socket: %s : %d \n", 
-               inet_ntoa(server_address.sin_addr),                                  // server's in address
-               ntohs(server_address.sin_port));                                     // server's in port
 
     // BIND() - binds socket to port
         // if(bind(client_socket, (struct sockaddr *)&server_address, sizeof(server_address)) == -1){
@@ -101,24 +101,8 @@ UDP
         // }
 
     // SENDTO() - sending message to server 
-        // OPCODE: 0 = request
-        //         1 = response
-        //
-        //         0               1              2               3
-        // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-        // +---------------+---------------+-------------------------------+    OPCODE         --->     + - / *
-        // |     Opcode    |Payload Length |          Payload Data         |    PAYLOAD LENGTH --->     length of sent message
-        // |      (8)      |      (8)      |                               |    PAYLOAD DATA   --->     message itself
-        // +---------------+---------------+ - - - - - - - - - - - - - - - +
-        // :                     Payload Data continued ...                :
-        // + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
-        // |                     Payload Data continued ...                |
-        // +---------------------------------------------------------------+
-
-        //struct sockaddr *address = (struct sockaddr *) &server_address;
         socklen_t server_size = sizeof(server_address);                         
-
-        memset(buffer, 0, BUFFER_SIZE);                                  // Fills buffer with 0
+        memset(buffer, 0, BUFFER_SIZE);                                     // Fills buffer with 0
 
     // MESSAGE
         if(fgets(input, BUFFER_SIZE, stdin) == NULL){                       // Reads from input 
@@ -126,37 +110,23 @@ UDP
             return 1;
         }
 
-        int inputLength = (int) strlen(input) - 1;                          // - 1, because '\0' is not considered as part of the payload length
-        buffer[0] = 0;                                                      // Opcode
+        int inputLength = (int) strlen(input) - 1;                          // - 1, because '\n' is not considered as part of the payload length
+        buffer[0] = 0;                                                      // Opcode (0 = request)
         buffer[1] = inputLength;                                            // Payload Length
 
         for(int i  = 0; i < inputLength; i++){                              // Fills the payload data area with user input
             buffer[i + 2] = input[i];                                      
         }
-        //close(client_socket);
-        //int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, address, server_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
-        int bytes_tx = sendto(client_socket, buffer, (inputLength + 3), 0, (struct sockaddr *) &server_address, server_size);    // inputLength + 3, because opcode + payloadLength + input (not counting '\0')
+
+        int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, (struct sockaddr *) &server_address, server_size);    // inputLength + 2, because opcode + payloadLength + input (not counting '\0')
         if(bytes_tx < 0){
             fprintf(stderr, "ERROR: sendto.\n");
         }
+
         printf("Bytes sent %d\n", bytes_tx);
+        memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
         
     // RECVFROM() - waiting for response
-        // STATUS CODE: 0 = OK
-        //              1 = ERROR
-        //
-        // 0                   1                   2                   3
-        // 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-        // +---------------+---------------+---------------+---------------+
-        // |     Opcode    |  Status Code  |Payload Length | Payload Data  |
-        // |      (8)      |      (8)      |      (8)      |               |
-        // +---------------+---------------+---------------+ - - - - - - - +
-        // :                     Payload Data continued ...                :
-        // + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
-        // |                     Payload Data continued ...                |
-        // +---------------------------------------------------------------+
-
-        memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
         
         int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, (struct sockaddr *) &server_address, &server_size);
         printf("doslo\n");
@@ -178,12 +148,11 @@ UDP
 
         int responseLength = buffer[3];
         printf("OK:");
+
         for(int i = 3; i < responseLength + 3; i++){
             printf("%c", buffer[i]);
         }
         printf("\n");
-
-        close(client_socket);
     }
 
     if(strcmp(conType, "tcp") == 0){        // TCP
