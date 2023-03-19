@@ -132,7 +132,14 @@ int main(int argc, char** argv){
             
             if(fgets(input, BUFFER_SIZE_UDP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input2.\n");
+                if(!keepRunning){
+                    break;
+                }
                 return 1;
+            }
+
+            if(!keepRunning){
+                break;
             }
 
             if(strcmp(input, "exit\n") == 0){
