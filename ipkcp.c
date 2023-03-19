@@ -19,8 +19,34 @@
 
 static volatile int keepRunning = 1;
 
-void intHandler() {
+// void intHandler() {
+//     keepRunning = 0;
+// }
+
+void intHandler(int socket, char mode[]) {
     keepRunning = 0;
+
+    if(strcmp(mode, "tcp")){
+        char buff[4] = "BYE";
+        int bytes_tx = send(socket, buff, strlen(buff), 0);
+        if(bytes_tx < 0){
+            fprintf(stderr, "ERROR: send.\n");
+        }
+
+        int bytes_rx = recv(socket, buff, 4, 0);
+        if(bytes_rx < 0){
+            fprintf(stderr, "ERROR: recv.\n");
+        }
+
+        printf("%s", buff);                                                   // Server's response
+
+        shutdown(socket, SHUT_RD);
+        shutdown(socket, SHUT_WR);
+        shutdown(socket, SHUT_RDWR);
+
+        close(socket);
+    }
+
 }
 
 int main(int argc, char** argv){
@@ -66,7 +92,6 @@ int main(int argc, char** argv){
         fprintf(stderr, "ERROR: no such host %s.\n", host_address);
         return 1;
     }
-    printf("host address %s\n", host_address);
 
     struct sockaddr_in server_address;
     memset(&server_address, 0, sizeof(server_address));                         // fills server address with zeros
@@ -149,7 +174,7 @@ int main(int argc, char** argv){
     }
 
 // TCP ------------------------------------------------------------------------------------------
-    if(strcmp(conType, "tcp") == 0){        // TCP
+    if(strcmp(conType, "tcp") == 0){      
     // SOCKET() - creating socket
         int type = SOCK_STREAM;
         int client_socket = socket(family, type, 0);
@@ -163,8 +188,6 @@ int main(int argc, char** argv){
             fprintf(stderr, "ERROR: connect.\n");
             return 1;
         }
-
-        printf("connected\n");
 
         while(keepRunning){
         // MESSAGE
@@ -197,10 +220,13 @@ int main(int argc, char** argv){
         }
 
     // CLOSE()
-        if(!keepRunning) 
+        if(!keepRunning){ 
             printf("zmacklo se C-c, ukoncuju.\n");
-        else
+
+
+        } else {
             printf("ukoncuju\n");
+        }
 
         shutdown(client_socket, SHUT_RD);
         shutdown(client_socket, SHUT_WR);
