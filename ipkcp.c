@@ -70,7 +70,7 @@ int main(int argc, char** argv){
 
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(port_number);                               // sets port that the socket will use. htonl() translates an unsigned long integer into network byte order
-    memcpy(&server_address.sin_addr.s_addr, server->h_addr, server->h_length); 
+    memcpy(&server_address.sin_addr.s_addr, server->h_addr_list[0], server->h_length); 
 
     printf("INFO: Server socket: %s : %d \n", 
             inet_ntoa(server_address.sin_addr),                                  // server's in address
