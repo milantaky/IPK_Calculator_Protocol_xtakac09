@@ -8,7 +8,8 @@
 #include <unistd.h>         // close
 #include <signal.h>         // C-c interrupt signal
 
-#define BUFFER_SIZE 512     // maximum length of payload - 256B + 2B (opcode, payload length)
+#define BUFFER_SIZE_UDP 512     
+#define BUFFER_SIZE_TCP 1024     
 
 // TODO
 //  - check adresy v argumentu
@@ -53,8 +54,10 @@ int main(int argc, char** argv){
     strcpy(host_address, argv[2]);
 
     int port_number = atoi(argv[4]);
-    char buffer[BUFFER_SIZE];
-    char input[BUFFER_SIZE];
+    char buffer_udp[BUFFER_SIZE_UDP];
+    char buffer_tcp[BUFFER_SIZE_TCP];
+    char input[BUFFER_SIZE_UDP];
+    char input_tcp[BUFFER_SIZE_TCP];
     int family = AF_INET;                                                       // ipv4
 
     // Getting the message to send, getting server info 
@@ -91,9 +94,9 @@ int main(int argc, char** argv){
 
         while(keepRunning){
         // MESSAGE
-            memset(buffer, 0, BUFFER_SIZE);                                     // Fills buffer with 0
+            memset(buffer_udp, 0, BUFFER_SIZE_UDP);                                 // Fills buffer with 0
             
-            if(fgets(input, BUFFER_SIZE, stdin) == NULL){                       // Reads from input 
+            if(fgets(input, BUFFER_SIZE_UDP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input.\n");
                 return 1;
             }
@@ -104,40 +107,40 @@ int main(int argc, char** argv){
             }
 
             int inputLength = (int) strlen(input) - 1;                          // - 1, because '\n' is not considered as part of the payload length
-            buffer[0] = 0;                                                      // Opcode (0 = request)
-            buffer[1] = inputLength;                                            // Payload Length
+            buffer_udp[0] = 0;                                                      // Opcode (0 = request)
+            buffer_udp[1] = inputLength;                                            // Payload Length
 
             for(int i  = 0; i < inputLength; i++){                              // Fills the payload data area with user input
-                buffer[i + 2] = input[i];                                      
+                buffer_udp[i + 2] = input[i];                                      
             }
 
         // SENDTO() - sending message to server 
-            int bytes_tx = sendto(client_socket, buffer, (inputLength + 2), 0, (struct sockaddr *) &server_address, server_size);    // inputLength + 2, because opcode + payloadLength + input (not counting '\0')
+            int bytes_tx = sendto(client_socket, buffer_udp, (inputLength + 2), 0, (struct sockaddr *) &server_address, server_size);    // inputLength + 2, because opcode + payloadLength + input (not counting '\0')
             if(bytes_tx < 0){
                 fprintf(stderr, "ERROR: sendto.\n");
             }
 
-            memset(buffer, 0, sizeof(buffer));                                   // Fills buffer with 0
+            memset(buffer_udp, 0, sizeof(buffer_udp));                                   // Fills buffer with 0
             
         // RECVFROM() - waiting for response
             
-            int bytes_rx = recvfrom(client_socket, buffer, BUFFER_SIZE, 0, (struct sockaddr *) &server_address, &server_size);
+            int bytes_rx = recvfrom(client_socket, buffer_udp, BUFFER_SIZE_UDP, 0, (struct sockaddr *) &server_address, &server_size);
             if(bytes_rx < 0){
                 fprintf(stderr, "ERROR: recvfrom.\n");
                 return 1;
             } 
 
-            int responseStatus = buffer[1];
-            int responseLength = buffer[3];
+            int responseStatus = buffer_udp[1];
+            int responseLength = buffer_udp[3];
             if(responseStatus == 1){           // STATUS CODE: 0 = OK, 1 = ERR
                 fprintf(stderr, "ERR:");
                 for(int i = 3; i < responseLength + 3; i++){
-                    printf("%c", buffer[i]);
+                    printf("%c", buffer_udp[i]);
                 }
             } else {                            // Had to duplicate it because of the new line (ERR sends \n, OK does not)
                 printf("OK:");
                 for(int i = 3; i < responseLength + 3; i++){
-                    printf("%c", buffer[i]);
+                    printf("%c", buffer_udp[i]);
                 }
                 printf("\n");
             }
@@ -161,34 +164,39 @@ int main(int argc, char** argv){
             return 1;
         }
 
+        printf("connected\n");
+
         while(keepRunning){
         // MESSAGE
-            memset(buffer, 0, BUFFER_SIZE);                                     // Fills buffer with 0
+            memset(buffer_tcp, 0, BUFFER_SIZE_TCP);                                     // Fills buffer with 0
             printf("Napis message:");
             
-            if(fgets(input, BUFFER_SIZE, stdin) == NULL){                       // Reads from input 
+            if(fgets(input_tcp, BUFFER_SIZE_TCP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input.\n");
                 return 1;
             }
 
-            strcpy(buffer, input);                                              // Copies input into buffer
-            //buffer[strlen(input) + 1] = '\0';                                   // Puts '\0' as last character instead of '\n'
+            strcpy(buffer_tcp, input_tcp);                                              // Copies input into buffer
+            //buffer_tcp[strlen(input) + 1] = '\0';                                   // Puts '\0' as last character instead of '\n'
     
      // SEND()
-            int bytes_tx = send(client_socket, buffer, strlen(buffer), 0);
+            int bytes_tx = send(client_socket, buffer_tcp, strlen(buffer_tcp), 0);
             if(bytes_tx < 0){
                 fprintf(stderr, "ERROR: send.\n");
             }
+            printf("sent\n");
 
-            memset(buffer, 0, BUFFER_SIZE);                                     // Fills buffer with 0
+            memset(buffer_tcp, 0, BUFFER_SIZE_TCP);                                     // Fills buffer with 0
 
     // RECV()
-            int bytes_rx = recv(client_socket, buffer, BUFFER_SIZE, 0);
+            int bytes_rx = recv(client_socket, buffer_tcp, BUFFER_SIZE_TCP, 0);
             if(bytes_rx < 0){
                 fprintf(stderr, "ERROR: recv.\n");
             }
 
-            if(strcmp(buffer, "BYE") == 0) break;
+            printf("SERVER: %s\n", buffer_tcp);
+
+            if(strcmp(buffer_tcp, "BYE") == 0) break;
         }
 
     // CLOSE()
@@ -202,7 +210,6 @@ int main(int argc, char** argv){
         shutdown(client_socket, SHUT_RDWR);
 
         close(client_socket);
-        // tady doplnit kod pro interrupt aby se to odpojilo, a asi i normalne
     }
 
     printf("koncim\n");
