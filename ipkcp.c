@@ -18,8 +18,8 @@
 // rozdil mezi win a unix bude mozna v adresach neceho, struktura sockaddr_in nebo tak
 
 static volatile int keepRunning = 1;
-int interruptSocket;                                                            // Global integer for socket because of interrupt signal, for communication is still used original variable
-char mode[4];                                                                   // Same reason as line above       
+// int interruptSocket;                                                            // Global integer for socket because of interrupt signal, for communication is still used original variable
+// char mode[4];                                                                   // Same reason as line above       
 
 void intHandler() {
     keepRunning = 0;
@@ -56,7 +56,7 @@ int main(int argc, char** argv){
     char host_address[16];               
     strcpy(host_address, argv[2]);
 
-    strcpy(mode, conType);
+    //strcpy(mode, conType);
 
     int port_number = atoi(argv[4]);
     char buffer_udp[BUFFER_SIZE_UDP];
@@ -96,7 +96,7 @@ int main(int argc, char** argv){
             return 1;
         }
 
-        interruptSocket = client_socket;
+        //interruptSocket = client_socket;
 
         while(keepRunning){
         // MESSAGE
@@ -168,7 +168,7 @@ int main(int argc, char** argv){
             return 1;
         }
 
-        interruptSocket = client_socket;
+        //interruptSocket = client_socket;
 
     // CONNECT
         if(connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address)) != 0){
@@ -183,7 +183,7 @@ int main(int argc, char** argv){
             if(fgets(input_tcp, BUFFER_SIZE_TCP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input.\n");
                 if(!keepRunning){
-                    strcpy(input_tcp, "BE");
+                    strcpy(input_tcp, "BYE\n");
                     break;
                 }
             }
