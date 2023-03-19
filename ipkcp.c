@@ -132,11 +132,7 @@ int main(int argc, char** argv){
             
             if(fgets(input, BUFFER_SIZE_UDP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input2.\n");
-                if(!keepRunning){
-                    break;
-                } else {
-                    return 1;
-                }
+                return 1;
             }
 
             if(!keepRunning){
@@ -214,7 +210,11 @@ int main(int argc, char** argv){
             
             if(fgets(input_tcp, BUFFER_SIZE_TCP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input1.\n");
-                return 1;
+                if(!keepRunning){
+                    break;
+                } else {
+                    return 1;
+                }
             }
 
             strcpy(buffer_tcp, input_tcp);                                              // Copies input into buffer
