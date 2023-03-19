@@ -244,7 +244,9 @@ int main(int argc, char** argv){
     // CLOSE()
         if(!keepRunning){ 
             printf("zmacklo se C-c, ukoncuju.\n");
+            memset(buffer_tcp, 0, BUFFER_SIZE_TCP); 
             strcpy(buffer_tcp, input_tcp);
+            printf("TU buff: %s\n", buffer_tcp);
 
             if(send(client_socket, buffer_tcp, strlen(buffer_tcp), 0) < 0){
                 fprintf(stderr, "ERROR: send.\n");
