@@ -23,29 +23,29 @@ static volatile int keepRunning = 1;
 //     keepRunning = 0;
 // }
 
-void intHandler(int socket, char mode[]) {
+void intHandler() {
     keepRunning = 0;
+    printf("dostal jsem se sem\n");
+    // if(strcmp(mode, "tcp")){
+    //     char buff[4] = "BYE";
+    //     int bytes_tx = send(socket, buff, strlen(buff), 0);
+    //     if(bytes_tx < 0){
+    //         fprintf(stderr, "ERROR: send.\n");
+    //     }
 
-    if(strcmp(mode, "tcp")){
-        char buff[4] = "BYE";
-        int bytes_tx = send(socket, buff, strlen(buff), 0);
-        if(bytes_tx < 0){
-            fprintf(stderr, "ERROR: send.\n");
-        }
+    //     int bytes_rx = recv(socket, buff, 4, 0);
+    //     if(bytes_rx < 0){
+    //         fprintf(stderr, "ERROR: recv.\n");
+    //     }
 
-        int bytes_rx = recv(socket, buff, 4, 0);
-        if(bytes_rx < 0){
-            fprintf(stderr, "ERROR: recv.\n");
-        }
+    //     printf("%s", buff);                                                   // Server's response
 
-        printf("%s", buff);                                                   // Server's response
+    //     shutdown(socket, SHUT_RD);
+    //     shutdown(socket, SHUT_WR);
+    //     shutdown(socket, SHUT_RDWR);
 
-        shutdown(socket, SHUT_RD);
-        shutdown(socket, SHUT_WR);
-        shutdown(socket, SHUT_RDWR);
-
-        close(socket);
-    }
+    //     close(socket);
+    // }
 
 }
 
