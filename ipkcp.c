@@ -137,6 +137,7 @@ int main(int argc, char** argv){
                 for(int i = 3; i < responseLength + 3; i++){
                     printf("%c", buffer_udp[i]);
                 }
+                printf("\n");
             } else {                                                                    // Had to duplicate it because of the new line (ERR sends \n, OK does not)
                 printf("OK:");
                 for(int i = 3; i < responseLength + 3; i++){
