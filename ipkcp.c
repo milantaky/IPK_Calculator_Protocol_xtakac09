@@ -21,11 +21,6 @@ static volatile int keepRunning = 1;
 int interruptSocket;                                                            // Global integer for socket because of interrupt signal, for communication is still used original variable
 char mode[4];                                                                   // Same reason as line above       
 
-// void intHandler() {
-//     keepRunning = 0;
-// }
-
-
 void intHandler() {
     keepRunning = 0;
     return;
@@ -188,12 +183,10 @@ int main(int argc, char** argv){
             if(fgets(input_tcp, BUFFER_SIZE_TCP, stdin) == NULL){                       // Reads from input 
                 fprintf(stderr, "ERROR occured while reading input.\n");
                 if(!keepRunning){
-                    strcpy(input_tcp, "BYE");
+                    strcpy(input_tcp, "BE");
                     break;
                 }
             }
-            
-            //if(!keepRunning) break;
 
             strcpy(buffer_tcp, input_tcp);                                              // Copies input into buffer
     
@@ -229,7 +222,6 @@ int main(int argc, char** argv){
 
             printf("za sendem\n");
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP); 
-
             
             int bytes_sx = recv(client_socket, buffer_tcp, BUFFER_SIZE_TCP, 0);
             if(bytes_sx < 0){
