@@ -139,7 +139,7 @@ int main(int argc, char** argv){
                 break;
             }
 
-            if(strcmp(input, "exit\n") == 0){
+            if(strcmp(input, "exit\n") == 0){                                   // Exit message
                 printf("Exiting...\n");
                 return 0;
             }
@@ -217,6 +217,8 @@ int main(int argc, char** argv){
                     break;
                 }
             }
+            printf("jeste su tu1\n");
+            //if(!keepRunning) break;
 
             strcpy(buffer_tcp, input_tcp);                                              // Copies input into buffer
     
@@ -227,7 +229,7 @@ int main(int argc, char** argv){
             }
 
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP);                                     // Fills buffer with 0
-
+            printf("jeste su tu2 za sendem\n");
     // RECV()
             int bytes_rx = recv(client_socket, buffer_tcp, BUFFER_SIZE_TCP, 0);
             if(bytes_rx < 0){
@@ -245,7 +247,7 @@ int main(int argc, char** argv){
         } else {
             printf("ukoncuju\n");
         }
-
+        printf("jeste su tu3 u close\n");
         shutdown(client_socket, SHUT_RD);
         shutdown(client_socket, SHUT_WR);
         shutdown(client_socket, SHUT_RDWR);
