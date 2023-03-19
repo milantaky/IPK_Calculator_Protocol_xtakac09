@@ -194,9 +194,9 @@ int main(int argc, char** argv){
                 fprintf(stderr, "ERROR: recv.\n");
             }
 
-            printf("SERVER: %s\n", buffer_tcp);
+            printf("%s", buffer_tcp);                                                   // Server's response
 
-            if(strcmp(buffer_tcp, "BYE") == 0) break;
+            if(strcmp(buffer_tcp, "BYE\n") == 0) break;
         }
 
     // CLOSE()
