@@ -134,8 +134,9 @@ int main(int argc, char** argv){
                 fprintf(stderr, "ERROR occured while reading input2.\n");
                 if(!keepRunning){
                     break;
+                } else {
+                    return 1;
                 }
-                return 1;
             }
 
             if(!keepRunning){
