@@ -28,29 +28,6 @@ char mode[4];                                                                   
 
 void intHandler() {
     keepRunning = 0;
-    printf("dostal jsem se sem\n");
-
-    // if(strcmp(mode, "tcp")){
-    //     char buff[4] = "BYE";
-    //     int byte_tx = send(socket, buff, strlen(buff), 0);
-    //     if(byte_tx < 0){
-    //         fprintf(stderr, "ERROR: send.\n");
-    //     }
-
-    //     int byte_rx = recv(socket, buff, 4, 0);
-    //     if(byte_rx < 0){
-    //         fprintf(stderr, "ERROR: recv.\n");
-    //     }
-
-    //     printf("%s", buff);                                                   // Server's response
-
-    //     shutdown(socket, SHUT_RD);
-    //     shutdown(socket, SHUT_WR);
-    //     shutdown(socket, SHUT_RDWR);
-
-    //     close(socket);
-    // }
-
     return;
 }
 
@@ -259,6 +236,7 @@ int main(int argc, char** argv){
             }
 
             printf("%s", buffer_tcp);
+            printf("za printosem odpovedi\n");
 
         } else {
             printf("ukoncuju\n");
