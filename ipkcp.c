@@ -108,7 +108,7 @@ int main(int argc, char** argv){
             memset(buffer_udp, 0, BUFFER_SIZE_UDP);                                 // Fills buffer with 0
             
             if(fgets(input, BUFFER_SIZE_UDP, stdin) == NULL){                       // Reads from input 
-                fprintf(stderr, "ERROR occured while reading input2.\n");
+                fprintf(stderr, "ERROR occured while reading input.\n");
                 return 1;
             }
 
@@ -186,7 +186,7 @@ int main(int argc, char** argv){
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP);                                     // Fills buffer with 0
             
             if(fgets(input_tcp, BUFFER_SIZE_TCP, stdin) == NULL){                       // Reads from input 
-                fprintf(stderr, "ERROR occured while reading input1.\n");
+                fprintf(stderr, "ERROR occured while reading input.\n");
                 if(keepRunning){                                                       // Because of interrupt signal, if it was pressed, it goes here
                     return 1;
                 } else {
@@ -194,7 +194,7 @@ int main(int argc, char** argv){
                     break;
                 }
             }
-            printf("jeste su tu1\n");
+            
             //if(!keepRunning) break;
 
             strcpy(buffer_tcp, input_tcp);                                              // Copies input into buffer
@@ -223,18 +223,18 @@ int main(int argc, char** argv){
             printf("zmacklo se C-c, ukoncuju.\n");
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP); 
             strcpy(buffer_tcp, input_tcp);
-            printf("TU buff: %s\n", buffer_tcp);
 
             if(send(client_socket, buffer_tcp, strlen(buffer_tcp), 0) < 0){
                 fprintf(stderr, "ERROR: send.\n");
             }
 
+            printf("za sendem\n");
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP); 
 
             if(recv(client_socket, buffer_tcp, BUFFER_SIZE_TCP, 0) < 0){
                 fprintf(stderr, "ERROR: recv.\n");
             }
-
+            printf("za recv\n");
             printf("%s", buffer_tcp);
             printf("za printosem odpovedi\n");
 
