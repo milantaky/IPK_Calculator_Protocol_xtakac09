@@ -18,23 +18,27 @@
 // rozdil mezi win a unix bude mozna v adresach neceho, struktura sockaddr_in nebo tak
 
 static volatile int keepRunning = 1;
+int interruptSocket;                                                            // Global integer for socket because of interrupt signal, for communication is still used original variable
+char mode[4];                                                                   // Same reason as line above       
 
 // void intHandler() {
 //     keepRunning = 0;
 // }
 
+
 void intHandler() {
     keepRunning = 0;
     printf("dostal jsem se sem\n");
+
     // if(strcmp(mode, "tcp")){
     //     char buff[4] = "BYE";
-    //     int bytes_tx = send(socket, buff, strlen(buff), 0);
-    //     if(bytes_tx < 0){
+    //     int byte_tx = send(socket, buff, strlen(buff), 0);
+    //     if(byte_tx < 0){
     //         fprintf(stderr, "ERROR: send.\n");
     //     }
 
-    //     int bytes_rx = recv(socket, buff, 4, 0);
-    //     if(bytes_rx < 0){
+    //     int byte_rx = recv(socket, buff, 4, 0);
+    //     if(byte_rx < 0){
     //         fprintf(stderr, "ERROR: recv.\n");
     //     }
 
@@ -47,6 +51,7 @@ void intHandler() {
     //     close(socket);
     // }
 
+    return;
 }
 
 int main(int argc, char** argv){
@@ -78,6 +83,8 @@ int main(int argc, char** argv){
 
     char host_address[16];               
     strcpy(host_address, argv[2]);
+
+    strcpy(mode, conType);
 
     int port_number = atoi(argv[4]);
     char buffer_udp[BUFFER_SIZE_UDP];
@@ -116,6 +123,8 @@ int main(int argc, char** argv){
             fprintf(stderr, "ERROR: socket.\n");
             return 1;
         }
+
+        interruptSocket = client_socket;
 
         while(keepRunning){
         // MESSAGE
@@ -182,6 +191,8 @@ int main(int argc, char** argv){
             fprintf(stderr, "ERROR: socket.\n");
             return 1;
         }
+
+        interruptSocket = client_socket;
 
     // CONNECT
         if(connect(client_socket, (struct sockaddr *) &server_address, sizeof(server_address)) != 0){
