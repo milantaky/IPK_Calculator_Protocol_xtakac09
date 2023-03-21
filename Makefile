@@ -1,9 +1,9 @@
-#Project:   IPK Calculator Protocol
-#Author:    Milan Takac - xtakac09
-#2.BIT 2023
+# Project 1 - IPK calculator protocol
+# Author: Milan Takac - xtakac09
+# 2BIT VUT FIT (BUT)
 
 cc=GCC
 CFLAGS= -std=c99 -pedantic -Wall -Wextra -Werror
 
-ipkcp: ipkcp.c
-	$(CC) $(CFLAGS) ipkcp.c -o ipkcp
+ipkcpc: ipkcpc.c
+	$(CC) $(CFLAGS) ipkcpc.c -o ipkcpc
