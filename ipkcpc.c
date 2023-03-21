@@ -58,7 +58,7 @@ int main(int argc, char** argv){
     strcpy(host_address, argv[2]);
     strcpy(conType, argv[6]);
 
-    // Getting the message to send, getting server info 
+    // Getting server info 
     struct hostent *server = gethostbyname(host_address);                               // Gets info about server. Parameter takes either address or name
     if(server == NULL){                                                                 // Invalid server name
         fprintf(stderr, "ERROR: no such host %s.\n", host_address);
