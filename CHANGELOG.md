@@ -32,9 +32,9 @@ Code is well documented, so there shouldn't be any problem with trying to unders
 Different operating systems
 There are different things to look for in code like this to be multiplatform. This code is 
 written for UNIX systems. 
-Few key differences are sockets. Each system uses different libraryfor them. For example 
-WINDOWS uses library winsock.h meanwile UNIX uses sys/socket.h, the process of creating them 
-is also different. Another thing to take in mind are different different byte orders. WINDOWS
-uses little-endian and UNIX uses big-endian. Unfortunately this code isn't implemented for 
-using on WINDOWS.
+Few key differences are sockets. Each system uses different library for them. For example 
+WINDOWS uses library winsock.h meanwile UNIX uses sys/socket.h. The process of creating them 
+is also different. Another thing to take in mind are different byte orders. WINDOWS uses 
+little-endian and UNIX uses big-endian. Unfortunately this code isn't implemented for using 
+on WINDOWS.
 

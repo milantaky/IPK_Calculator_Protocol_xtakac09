@@ -7,10 +7,10 @@ with Arithmetics-as-a-Service (Aaas) with simple equation (+ - * /), receive ser
 result and print it to terminal.
 
 The client is started using: command make to compile the source code and get an executable file, then
-using command "ipkcpc -h <host> -p <port> -m <mode>" where host is the IPv4 address of the server, 
-port the server port, and mode either tcp or udp (e.g., ipkcpc -h 1.2.3.4 -p 2023 -m udp), then you will
-then you see SERVER INFO with ip address and port you are sending your requests to. To send a request,
-click on new line under SERVER INFO, and insert your message and press ENTER. 
+using command "ipkcpc -h < host > -p < port > -m < mode >" where host is the IPv4 address of the server, 
+port the server port, and mode either tcp or udp (e.g., ipkcpc -h 1.2.3.4 -p 2023 -m udp), then you see
+SERVER INFO with ip address and port you are sending your requests to. To send a request, click on new 
+line under SERVER INFO, insert your message and press ENTER. 
 
 For UDP request send message such as: 
 (+ 1 2)
