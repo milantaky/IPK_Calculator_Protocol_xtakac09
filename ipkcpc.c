@@ -208,7 +208,6 @@ int main(int argc, char** argv){
             memset(buffer_tcp, 0, BUFFER_SIZE_TCP); 
             strcpy(buffer_tcp, input_tcp);
 
-            int mistake = 0;
             int bytes_tx = send(client_socket, buffer_tcp, strlen(buffer_tcp), 0);
             if(bytes_tx < 0){
                 fprintf(stderr, "ERROR: send.\n");
