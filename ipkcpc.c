@@ -15,8 +15,6 @@
 #define BUFFER_SIZE_UDP 512     
 #define BUFFER_SIZE_TCP 1024     
 
-// rozdil mezi win a unix bude mozna v adresach neceho, struktura sockaddr_in nebo tak
-
 static volatile int keepRunning = 1;                                                    // Help variable in case of interrupt
 
 void intHandler() {
